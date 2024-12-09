@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Update with your database URL
+}
+
+
+
+model Customer {
+  customer_id  Int       @id @default(autoincrement())
+  bank_id      String    @unique
+  first_name   String?
+  last_name    String?
+  email        String?   @unique
+  phone        String?
+  address      String?
+  city         String?
+  postal_code  String?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  insurances   CustomerInsurance[]
+  contact_us   ContactUs[]
+}
+
+model InsurancePackage {
+  package_id   Int       @id @default(autoincrement())
+  name         String
+  description  String?
+  base_price   Decimal?
+  is_active    Boolean   @default(true)
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  customer_insurances CustomerInsurance[]
+  dynamic_pricing     DynamicPricing[]
+}
+
+model CustomerInsurance {
+  customer_insurance_id Int       @id @default(autoincrement())
+  customer_id           Int
+  package_id            Int
+  start_date            DateTime
+  end_date              DateTime?
+  price                 Decimal
+  status                String    @default("active")
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  customer  Customer        @relation(fields: [customer_id], references: [customer_id], onDelete: Cascade)
+  package   InsurancePackage @relation(fields: [package_id], references: [package_id], onDelete: Cascade)
+  payments  Payment[]
+}
+
+model Payment {
+  payment_id             Int       @id @default(autoincrement())
+  customer_insurance_id  Int
+  amount                 Decimal
+  status                 String    @default("pending")
+  payment_date           DateTime?
+  payment_method         String?
+  transaction_id         String?   @unique
+  created_at             DateTime  @default(now())
+  updated_at             DateTime  @updatedAt
+
+  customer_insurance  CustomerInsurance @relation(fields: [customer_insurance_id], references: [customer_insurance_id], onDelete: Cascade)
+}
+
+model ContactUs {
+  contact_id   Int       @id @default(autoincrement())
+  customer_id  Int?
+  name         String
+  email        String
+  message      String
+  status       String    @default("pending")
+  created_at   DateTime  @default(now())
+
+  customer     Customer? @relation(fields: [customer_id], references: [customer_id], onDelete: SetNull)
+}
+
+model BlogPost {
+  post_id       Int       @id @default(autoincrement())
+  title         String
+  content       String?
+  author        String?
+  is_published  Boolean   @default(false)
+  published_at  DateTime?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+}
+
+model AdminUser {
+  admin_id      Int       @id @default(autoincrement())
+  username      String    @unique
+  email         String    @unique
+  password_hash String
+  role          String    @default("admin")
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+}
+
+model DynamicPricing {
+  pricing_id    Int       @id @default(autoincrement())
+  package_id    Int
+  customer_type String?
+  discount      Decimal?
+  created_at    DateTime  @default(now())
+
+  package       InsurancePackage @relation(fields: [package_id], references: [package_id], onDelete: Cascade)
+}
