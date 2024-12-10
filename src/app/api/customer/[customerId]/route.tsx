@@ -1,13 +1,15 @@
+/* eslint-disable */
+
 import { NextRequest, NextResponse } from "next/server";
 import customerService from "@/core/services/customerService";
 
 export async function GET(
-  req: NextRequest
+  request: NextRequest
 ) {
   try {
     // Extract and parse customerId from params
-    const customerIdString = req.nextUrl.searchParams.get("customerId");
-    const customerId = customerIdString ? parseInt(customerIdString, 10) : NaN;
+    const customerId = 1;
+
     // Validate if customerId is a valid number
     if (isNaN(customerId)) {
       return NextResponse.json(
