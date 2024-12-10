@@ -6,5 +6,6 @@ export interface AuthRequestDTO {
     orderRef: string;
     qrStartToken: string;
     autoStartToken: string;
+    qrData?: string;
   }
   

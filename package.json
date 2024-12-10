@@ -14,12 +14,14 @@
     "bankid": "^3.2.1",
     "crypto": "^1.0.1",
     "next": "15.0.4",
+    "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@prisma/client": "^6.0.1",
     "@types/node": "^20",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^8",

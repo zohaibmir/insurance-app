@@ -7,5 +7,6 @@ export interface SignRequestDTO {
     orderRef: string;
     qrStartToken: string;
     autoStartToken: string;
+    qrData?: string;
   }
   
