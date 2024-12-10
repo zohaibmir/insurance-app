@@ -1,12 +1,10 @@
 import fs from "fs";
 
 const BASE_CERT_PATH = process.cwd() + '/src/assets/certs';
-const BANKID_API_VERSION = '6.0';
-console.log(BASE_CERT_PATH);
 export const config = {
     mobileBankIdPolicy: '1.2.3.4.25',
-    bankdIdUrl: `https://appapi2.bankid.com/rp/v${BANKID_API_VERSION}`,
+    bankdIdUrl: process.env.BANKID_URL,
     pfx: fs.readFileSync(`${BASE_CERT_PATH}/smooother.p12`),
-    passphrase: 'cDf8A-wmjx2LxsYN',
+    passphrase: process.env.BANKID_PASSPHRASE,
     ca: fs.readFileSync(`${BASE_CERT_PATH}/smooother.cer`),
 };
