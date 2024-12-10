@@ -25,6 +25,7 @@ model Customer {
   address      String?
   city         String?
   postal_code  String?
+  apartment_no String?
   created_at   DateTime  @default(now())
   updated_at   DateTime  @updatedAt
 

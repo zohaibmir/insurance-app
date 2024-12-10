@@ -1,5 +1,5 @@
-export interface CreateCustomerDTO {
-    bank_id: string;
+export interface UpdateCustomerDTO {
+    customer_id: number;
     first_name?: string;
     last_name?: string;
     email?: string;
@@ -7,4 +7,5 @@ export interface CreateCustomerDTO {
     address?: string;
     city?: string;
     postal_code?: string;
-  }
+    apartment_no?: string;
+}

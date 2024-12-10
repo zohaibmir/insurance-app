@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import customerService from "@/services/customerService";
-import { createCustomerSchema } from "@/validations/customerValidation";
+import customerService from "@/core/services/customerService";
+import { createCustomerSchema } from "@/core/validations/customerValidation";
 
 export async function POST(request: Request) {
   try {
@@ -15,15 +15,10 @@ export async function POST(request: Request) {
     return NextResponse.json(newCustomer, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message || "Failed to create customer" },
-        { status: 400 }
-      );
+
+      return NextResponse.json({ error: error.message || "Failed to create customer" }, { status: 400 });
     }
 
-    return NextResponse.json(
-      { error: "An unknown error occurred" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "An unknown error occurred" }, { status: 500 });
   }
 }

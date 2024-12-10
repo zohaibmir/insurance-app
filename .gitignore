@@ -17,6 +17,8 @@
 /assets
 /src/assets
 
+*.http
+
 # next.js
 /.next/
 /out/

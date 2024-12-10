@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import customerService from "@/services/customerService";
-import { updateCustomerSchema } from "@/validations/customerValidation";
+import customerService from "@/core/services/customerService";
+import { updateCustomerSchema } from "@/core/validations/customerValidation";
 
 export async function PUT(request: Request) {
     try {

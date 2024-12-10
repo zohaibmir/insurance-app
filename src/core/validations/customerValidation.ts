@@ -12,7 +12,7 @@ export const createCustomerSchema = z.object({
 });
 
 export const updateCustomerSchema = z.object({
-  customer_id: z.number().int("Customer ID must be an integer"),
+  customer_id: z.number(),
   first_name: z.string().optional(),
   last_name: z.string().optional(),
   email: z.string().email("Invalid email format").optional(),

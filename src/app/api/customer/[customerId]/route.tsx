@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import customerService from "@/services/customerService";
+import customerService from "@/core/services/customerService";
 
 export async function GET(
   req: NextRequest

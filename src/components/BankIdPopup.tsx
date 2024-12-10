@@ -1,8 +1,8 @@
 import React from "react";
 
 interface BankIdPopupProps {
-  qrData: string | null; // Base64 QR code data
-  onClose: () => void; // Function to close the popup
+  qrData: string | null;
+  onClose: () => void;
 }
 
 const BankIdPopup: React.FC<BankIdPopupProps> = ({ qrData, onClose }) => {
@@ -10,7 +10,6 @@ const BankIdPopup: React.FC<BankIdPopupProps> = ({ qrData, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-lg p-6 w-96 text-center">
         <h2 className="text-xl font-bold mb-4">Scan the QR Code</h2>
-
         {qrData ? (
           <img
             src={qrData}
@@ -20,12 +19,11 @@ const BankIdPopup: React.FC<BankIdPopupProps> = ({ qrData, onClose }) => {
         ) : (
           <p>Loading QR Code...</p>
         )}
-
         <button
           onClick={onClose}
-          className="mt-6 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+          className="mt-4 text-gray-500 hover:text-gray-700 transition"
         >
-          Close
+          Cancel
         </button>
       </div>
     </div>
