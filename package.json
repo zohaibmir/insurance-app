@@ -9,6 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "await-to-js": "^3.0.0",
+    "axios": "^1.7.9",
+    "bankid": "^3.2.1",
+    "crypto": "^1.0.1",
     "next": "15.0.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
