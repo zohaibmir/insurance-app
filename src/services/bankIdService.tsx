@@ -1,7 +1,7 @@
 import { axiosInstance } from "@/utils/axiosInstance";
 import { generateQrData } from "@/utils/cryptoUtils";
-import { AuthRequestDTO, AuthResponseDTO } from "@/dto/bankId/auth.dto";
-import { SignRequestDTO, SignResponseDTO } from "@/dto/bankId/sign.dto";
+import { AuthResponseDTO } from "@/dto/bankId/auth.dto";
+import { SignResponseDTO } from "@/dto/bankId/sign.dto";
 import to from "await-to-js";
 
 class BankIdService {
@@ -16,6 +16,7 @@ class BankIdService {
     );
 
     if (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const axiosError = error as any;
       if (axiosError.response?.data) {
         throw new Error(axiosError.response.data);
@@ -32,6 +33,7 @@ class BankIdService {
   async authenticate(ip: string): Promise<AuthResponseDTO> {
     const data = await this.call("auth", { endUserIp: ip });
 
+    console.log("Here is the data" + data);
     this.secretKeyStore.set(data.qrStartToken, data.qrStartSecret);
 
     return {

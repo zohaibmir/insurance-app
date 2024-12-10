@@ -19,10 +19,17 @@ export async function PUT(request: Request) {
         );
 
         return NextResponse.json(updatedCustomer, { status: 200 });
-    } catch (error: any) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return NextResponse.json(
+                { error: error.message || "Failed to create customer" },
+                { status: 400 }
+            );
+        }
+
         return NextResponse.json(
-            { error: error.message || "Failed to update customer" },
-            { status: 400 }
+            { error: "An unknown error occurred" },
+            { status: 500 }
         );
     }
 }
