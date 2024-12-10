@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 const refreshInterval = 2000; // QR Code refresh interval
@@ -13,7 +13,7 @@ interface UseBankIdResult {
     startAuthProcess: () => Promise<void>;
     startSignProcess: (userVisibleData: string) => Promise<void>;
 }
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const useBankId = (): UseBankIdResult => {
     const [qrData, setQrData] = useState<string | null>(null); // QR code
     const [orderRef, setOrderRef] = useState<string | null>(null); // Order reference
@@ -54,6 +54,7 @@ const useBankId = (): UseBankIdResult => {
     /**
      * Start the `sign` process to sign a document.
      * @param userVisibleData - The data visible to the user while signing.
+     * 
      */
     const startSignProcess = useCallback(async (userVisibleData: string) => {
         try {
