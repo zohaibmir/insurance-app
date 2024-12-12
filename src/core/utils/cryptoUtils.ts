@@ -1,3 +1,7 @@
+/**
+ * src/core/utils/cryptoUtils.ts
+ */
+
 import crypto from "crypto";
 
 export function generateQrData(

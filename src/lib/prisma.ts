@@ -1,3 +1,6 @@
+/**
+ * src/lib/prisma.ts
+ */
 import { PrismaClient } from "@prisma/client";
 
 // eslint-disable-next-line no-var

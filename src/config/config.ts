@@ -1,3 +1,6 @@
+/**
+ * src/config/config.ts
+ */
 import fs from "fs";
 
 const BASE_CERT_PATH = process.cwd() + '/src/assets/certs';

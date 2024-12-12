@@ -1,3 +1,6 @@
+/**
+ * src/components/BankIdPopup.tsx
+ */
 import React from "react";
 
 interface BankIdPopupProps {

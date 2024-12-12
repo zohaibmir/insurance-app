@@ -1,3 +1,6 @@
+/**
+ * src/core/services/customerService.ts
+ */
 import CustomerRepository from "@/core/repositories/customerRepository";
 import { CreateCustomerDTO } from "@/core/dto/customer/createCustomer.dto";
 import { UpdateCustomerDTO } from "@/core/dto/customer/updateCustomer.dto";

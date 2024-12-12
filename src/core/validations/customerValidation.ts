@@ -1,3 +1,7 @@
+/**
+ * src/core/validations/customerValidation.ts
+ */
+
 import * as z from "zod";
 
 export const createCustomerSchema = z.object({

@@ -1,3 +1,6 @@
+/**
+ * src/core/services/bankIdService.ts
+ */
 import { axiosInstance } from "@/core/utils/axiosInstance";
 import { generateQrData } from "@/core/utils/cryptoUtils";
 import { generateQrCodeBase64 } from "@/core/utils/qrCodeUtils";

@@ -1,3 +1,6 @@
+/**
+ * src/app/api/marknadsurval/route.ts
+ */
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import CustomerService from "@/core/services/customerService";

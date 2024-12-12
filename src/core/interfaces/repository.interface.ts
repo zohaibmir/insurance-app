@@ -1,3 +1,6 @@
+/**
+ * src/core/interfaces/respository.interface.ts
+ */
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 export interface Repository {
     create(data: any): Promise<any>;

@@ -1,4 +1,7 @@
 /* eslint-disable */
+/**
+ * src/app/api/customer/[customerid]/route.ts
+ */
 
 import { NextRequest, NextResponse } from "next/server";
 import customerService from "@/core/services/customerService";

@@ -1,8 +1,11 @@
+/**
+ * src/app/bankid/page.ts
+ */
 "use client";
 
 import React, { useState } from "react";
 import BankIdPopup from "@/components/BankIdPopup";
-import useBankId from "@/hooks/useBankId";
+import useBankId from "@/core/hooks/useBankId";
 
 const BankIdPage = () => {
   const {

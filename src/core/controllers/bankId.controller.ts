@@ -1,5 +1,10 @@
+/**
+ * src/core/controllers/bankid.controller.ts
+ */
 import { NextRequest, NextResponse } from "next/server";
 import bankIdService from "@/core/services/bankIdService";
+import { setSession } from "@/core/utils/sessionUtils";
+import customerService from "@/core/services/customerService";
 
 class BankIdController {
   /**
@@ -52,6 +57,19 @@ class BankIdController {
     }
 
     const data = await bankIdService.collect(orderRef);
+    if (data.status === "complete") {
+      const personalNumber = data.completionData?.user?.personalNumber;
+
+      if (personalNumber) {
+        // Save the user's ID (personalNumber) in the session
+        setSession("user_id", personalNumber);
+        // Check if email and phone are updated
+        const customer = await customerService.findCustomerByBankId(personalNumber);
+        if (customer?.email && customer?.phone) {
+          return NextResponse.json({ redirectTo: "/dashboard" });
+        }
+      }
+    }
     return NextResponse.json({ success: true, data });
   }
 

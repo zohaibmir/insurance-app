@@ -1,3 +1,7 @@
+/**
+ * src/core/hooks/useBankId.ts
+ */
+
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 

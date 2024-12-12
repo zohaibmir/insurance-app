@@ -1,3 +1,6 @@
+/**
+ * src/app/api/customer/update/route.ts
+ */
 import { NextResponse } from "next/server";
 import customerService from "@/core/services/customerService";
 import { updateCustomerSchema } from "@/core/validations/customerValidation";
@@ -11,14 +14,13 @@ export async function PUT(request: Request) {
 
         // Extract customer_id
         const { customer_id, ...updateData } = validatedData;
-
         // Update customer
         const updatedCustomer = await customerService.updateCustomer(
             customer_id,
             updateData
         );
 
-        return NextResponse.json(updatedCustomer, { status: 200 });
+        return NextResponse.json({success: true, updatedCustomer}, { status: 200 });
     } catch (error: unknown) {
         if (error instanceof Error) {
             return NextResponse.json(

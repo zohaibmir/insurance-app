@@ -1,3 +1,6 @@
+/**
+ * src/core/dto/updateCustomer.dto.ts
+ */
 export interface UpdateCustomerDTO {
     customer_id: number;
     first_name?: string;

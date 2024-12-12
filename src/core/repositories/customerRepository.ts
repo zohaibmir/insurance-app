@@ -1,3 +1,6 @@
+/**
+ * src/core/repositories/customerRepository.ts
+ */
 import prisma from "@/lib/prisma";
 import { CreateCustomerDTO } from "@/core/dto/customer/createCustomer.dto";
 import { UpdateCustomerDTO } from "@/core/dto/customer/updateCustomer.dto";

@@ -1,3 +1,6 @@
+/**
+ * src/core/dto/sign.dto.ts
+ */
 export interface SignRequestDTO {
   endUserIp: string;
   userVisibleData: string;

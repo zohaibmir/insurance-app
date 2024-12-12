@@ -1,3 +1,6 @@
+/**
+ * src/app/api/bankid/route.ts
+ */
 import { NextRequest, NextResponse } from "next/server";
 import BankIdController from "@/core/controllers/bankId.controller";
 

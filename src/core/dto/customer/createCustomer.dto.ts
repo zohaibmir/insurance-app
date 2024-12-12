@@ -1,3 +1,6 @@
+/**
+ * src/core/dto/createCustomer.dto.ts
+ */
 export interface CreateCustomerDTO {
   bank_id: string;
   first_name?: string;

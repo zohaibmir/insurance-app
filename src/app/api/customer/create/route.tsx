@@ -1,3 +1,6 @@
+/**
+ * src/app/api/customer/create/route.ts
+ */
 import { NextResponse } from "next/server";
 import customerService from "@/core/services/customerService";
 import { createCustomerSchema } from "@/core/validations/customerValidation";

@@ -1,3 +1,7 @@
+/**
+ * src/core/utils/qrCodeUtils.ts
+ */
+
 import QRCode from "qrcode";
 
 /**

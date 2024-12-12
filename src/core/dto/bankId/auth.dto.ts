@@ -1,3 +1,6 @@
+/**
+ * src/core/dto/auth.dto.ts
+ */
 export interface AuthRequestDTO {
   endUserIp: string;
 }
