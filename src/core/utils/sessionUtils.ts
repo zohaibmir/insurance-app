@@ -1,42 +1,40 @@
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+
+// In-memory session store (use Redis or a database in production)
+const sessionStore = new Map<string, { user_id: string }>();
 
 /**
- * Set a session value
- * @param key - The key for the session value
- * @param value - The value to store
- * @returns A NextResponse object with the cookie set
+ * Generate a session ID (use a more secure method in production).
  */
-export const setSession = (key: string, value: string): NextResponse => {
-  const response = NextResponse.next();
-  response.cookies.set(key, value, {
-    httpOnly: true,
-    path: "/",
-    secure: process.env.NODE_ENV === "production",
-  });
-  return response;
-};
+function generateSessionId(): string {
+  return Math.random().toString(36).substring(2, 15);
+}
 
 /**
- * Get a session value
- * @param key - The key for the session value
- * @returns The value stored in the session (or undefined if not found)
+ * Set a session.
+ * @param sessionId - The session ID.
+ * @param data - The session data.
  */
-export const getSession = async (key: string): Promise<string | undefined> => {
-  const cookieStore = await cookies();
-  return cookieStore.get(key)?.value;
-};
+export function setSession(sessionId: string, data: { user_id: string }) {
+  sessionStore.set(sessionId, data);
+}
 
 /**
- * Delete a session value
- * @param key - The key for the session value to delete
- * @returns A NextResponse object with the cookie deleted
+ * Get a session by session ID.
+ * @param request - The incoming request.
  */
-export const deleteSession = (key: string): NextResponse => {
-  const response = NextResponse.next();
-  response.cookies.delete({
-    name: key,
-    path: "/",
-  });
-  return response;
-};
+export async function getSession(request: NextRequest) {
+  const sessionId = request.cookies.get("session_id")?.value;
+  if (sessionId) {
+    return sessionStore.get(sessionId) || null;
+  }
+  return null;
+}
+
+/**
+ * Clear a session.
+ * @param sessionId - The session ID.
+ */
+export function clearSession(sessionId: string) {
+  sessionStore.delete(sessionId);
+}
