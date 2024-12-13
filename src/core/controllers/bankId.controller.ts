@@ -61,12 +61,21 @@ class BankIdController {
       const personalNumber = data.completionData?.user?.personalNumber;
 
       if (personalNumber) {
+        // Generate a session ID
+        const sessionId = Math.random().toString(36).substring(2);
+
         // Save the user's ID (personalNumber) in the session
-        setSession("user_id", personalNumber);
-        // Check if email and phone are updated
+        setSession(sessionId, { user_id: personalNumber });
+
         const customer = await customerService.findCustomerByBankId(personalNumber);
         if (customer?.email && customer?.phone) {
-          return NextResponse.json({ redirectTo: "/dashboard" });
+          const response = NextResponse.json({ redirectTo: "/dashboard" });
+          response.cookies.set("session_id", sessionId, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            path: "/",
+            maxAge: 60 * 60 * 24, // 1 day
+          });
         }
       }
     }

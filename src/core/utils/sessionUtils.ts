@@ -3,12 +3,12 @@ import { NextRequest } from "next/server";
 // In-memory session store (use Redis or a database in production)
 const sessionStore = new Map<string, { user_id: string }>();
 
-/**
- * Generate a session ID (use a more secure method in production).
- */
-function generateSessionId(): string {
-  return Math.random().toString(36).substring(2, 15);
-}
+// /**
+//  * Generate a session ID (use a more secure method in production).
+//  */
+// function generateSessionId(): string {
+//   return Math.random().toString(36).substring(2, 15);
+// }
 
 /**
  * Set a session.
