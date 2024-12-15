@@ -93,4 +93,8 @@ class BankIdController {
   }
 }
 
-export default new BankIdController();
+// Assign the instance of the controller to a named variable
+const bankIdController = new BankIdController();
+
+// Export the named variable
+export default bankIdController;

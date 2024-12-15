@@ -24,4 +24,5 @@ class CustomerRepository implements Repository {
   }
 }
 
-export default new CustomerRepository();
+const customerRepository = new CustomerRepository();
+export default customerRepository;

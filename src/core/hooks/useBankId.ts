@@ -5,9 +5,9 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
-const refreshInterval = 2000; // QR Code refresh interval
-const collectInterval = 2000; // Polling interval for collect
-const timeoutDuration = 30000; // Timeout duration for the process
+const refreshInterval = 1000; // QR Code refresh interval
+const collectInterval = 1000; // Polling interval for collect
+const timeoutDuration = 20000; // Timeout duration for the process
 
 interface UseBankIdResult {
     qrData: string | null;

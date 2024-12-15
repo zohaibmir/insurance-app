@@ -2,6 +2,7 @@
  * src/components/BankIdPopup.tsx
  */
 import React from "react";
+import Image from "next/image";
 
 interface BankIdPopupProps {
   qrData: string | null;
@@ -14,11 +15,13 @@ const BankIdPopup: React.FC<BankIdPopupProps> = ({ qrData, onClose }) => {
       <div className="bg-white rounded-lg shadow-lg p-6 w-96 text-center">
         <h2 className="text-xl font-bold mb-4">Scan the QR Code</h2>
         {qrData ? (
-          <img
-            src={qrData}
-            alt="BankID QR Code"
-            className="w-64 h-64 mx-auto"
-          />
+          <Image
+              src={qrData}
+              alt="BankID QR Code"
+              layout="fill" // Makes the image fill its container
+              objectFit="contain" // Ensures the QR code is fully visible
+              priority // Ensures it's loaded as soon as possible
+            />
         ) : (
           <p>Loading QR Code...</p>
         )}

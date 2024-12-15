@@ -1,7 +1,7 @@
 "use client";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider } from "@/components/ui/sidebar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Settings, FileText, CreditCard, Shield } from 'lucide-react'
+import { FileText, CreditCard, Shield } from 'lucide-react'
 import Link from "next/link"
 import { usePathname } from 'next/navigation';
 
@@ -23,7 +23,7 @@ export default function DashboardLayout({
               </Avatar>
               <div className="flex flex-col">
                 <span className="font-semibold">Jesper</span>
-                <Link href="/settings" className="text-sm text-blue-600 hover:underline">
+                <Link href="/profile" className="text-sm text-blue-600 hover:underline">
                   Inställningar
                 </Link>
               </div>
