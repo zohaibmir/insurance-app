@@ -1,233 +1,255 @@
-/**
- * src/core/hooks/useBankId.ts
- */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+//import { useRouter } from "next/navigation";
 
-const refreshInterval = 1000; // QR Code refresh interval
-const collectInterval = 1000; // Polling interval for collect
-const timeoutDuration = 20000; // Timeout duration for the process
+const REFRESH_INTERVAL = 1000; // QR Code refresh interval (1 second)
+const POLLING_INTERVAL = 2000; // Polling interval for collect (2 seconds)
+const TIMEOUT_DURATION = 30000; // Timeout duration for the process (30 seconds)
 
 interface UseBankIdResult {
-    qrData: string | null;
-    isLoading: boolean;
-    hasTimedOut: boolean;
-    isAuthenticated: boolean;
-    startAuthProcess: () => Promise<void>;
-    startSignProcess: (userVisibleData: string) => Promise<void>;
+  qrData: string | null;
+  isLoading: boolean;
+  hasTimedOut: boolean;
+  isAuthenticated: boolean;
+  startAuthProcess: () => Promise<boolean>;
+  startSignProcess: (userVisibleData: string) => Promise<boolean>;
+  resetBankIdProcess: () => void;
 }
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 const useBankId = (): UseBankIdResult => {
-    const [qrData, setQrData] = useState<string | null>(null); // QR code
-    const [orderRef, setOrderRef] = useState<string | null>(null); // Order reference
-    const [isLoading, setIsLoading] = useState(false); // Loading state
-    const [hasTimedOut, setHasTimedOut] = useState(false); // Timeout state
-    const [isAuthenticated, setIsAuthenticated] = useState(false); // Authentication status
-    const router = useRouter(); // Next.js router for redirection
+  const [qrData, setQrData] = useState<string | null>(null); // QR code data
+  const [orderRef, setOrderRef] = useState<string | null>(null); // Order reference
+  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [hasTimedOut, setHasTimedOut] = useState(false); // Timeout state
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Authentication status
+  //const router = useRouter(); // Next.js router for navigation (if needed)
 
-    /**
-     * Start the `auth` process to authenticate the user.
-     */
-    const startAuthProcess = useCallback(async () => {
-        try {
-            setIsLoading(true);
-            setHasTimedOut(false);
+  /**
+   * Resets all BankID states.
+   */
+  const resetBankIdProcess = useCallback(() => {
+    setQrData(null);
+    setOrderRef(null);
+    setIsLoading(false);
+    setHasTimedOut(false);
+    setIsAuthenticated(false);
+  }, []);
 
-            const response = await fetch("/api/bankid?method=auth", {
-                method: "GET",
-            });
-            const data = await response.json();
+  /**
+   * Starts the authentication process.
+   * Makes a request to initiate BankID authentication and fetches the QR code.
+   */
+  const startAuthProcess = useCallback(async (): Promise<boolean> => {
+    try {
+      resetBankIdProcess(); // Clear any previous state
+      setIsLoading(true);
 
-            if (data.success) {
-                const { qrData, orderRef, qrStartToken } = data.data;
+      const response = await fetch("/api/bankid?method=auth", {
+        method: "GET",
+      });
+      const data = await response.json();
 
-                setQrData(qrData); // Set QR data
-                setOrderRef(orderRef); // Store order reference
-                startPolling(orderRef, qrStartToken); // Start polling for `collect` and QR refresh
-            } else {
-                console.error("Error starting authentication:", data.error);
-            }
-        } catch (error) {
-            console.error("An error occurred while starting authentication:", error);
-        } finally {
-            setIsLoading(false);
+      if (data.success) {
+        const { qrData, orderRef, qrStartToken } = data.data;
+
+        setQrData(qrData); // Display the QR code
+        setOrderRef(orderRef); // Save the order reference
+
+        // Start polling and wait for it to complete
+        const success = await startPolling(orderRef, qrStartToken);
+        if (success) {
+          setIsAuthenticated(true);
+          return true; // Successfully authenticated
+        } else {
+          console.error("Authentication failed or timed out.");
+          return false;
         }
-    }, []);
+      } else {
+        console.error("Failed to start authentication:", data.error);
+        return false;
+      }
+    } catch (error) {
+      console.error("Error starting authentication:", error);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [resetBankIdProcess]);
 
-    /**
-     * Start the `sign` process to sign a document.
-     * @param userVisibleData - The data visible to the user while signing.
-     * 
-     */
-    const startSignProcess = useCallback(async (userVisibleData: string) => {
-        try {
-            setIsLoading(true);
-            setHasTimedOut(false);
+  /**
+   * Starts the signing process with BankID.
+   * @param userVisibleData - Data visible to the user during signing.
+   */
+  const startSignProcess = useCallback(async (userVisibleData: string): Promise<boolean> => {
+    try {
+      resetBankIdProcess(); // Clear any previous state
+      setIsLoading(true);
 
-            const response = await fetch("/api/bankid?method=sign", {
-                method: "GET",
-            });
-            const data = await response.json();
+      const response = await fetch("/api/bankid?method=sign", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userVisibleData }),
+      });
+      const data = await response.json();
 
-            if (data.success) {
-                const { qrData, orderRef, qrStartToken } = data.data;
+      if (data.success) {
+        const { qrData, orderRef, qrStartToken } = data.data;
 
-                setQrData(qrData); // Set QR data
-                setOrderRef(orderRef); // Store order reference
-                startPolling(orderRef, qrStartToken); // Start polling for `collect` and QR refresh
-            } else {
-                console.error("Error starting signing process:", data.error);
-            }
-        } catch (error) {
-            console.error("An error occurred while starting signing:", error);
-        } finally {
-            setIsLoading(false);
+        setQrData(qrData); // Display the QR code
+        setOrderRef(orderRef); // Save the order reference
+
+        // Start polling and wait for it to complete
+        const success = await startPolling(orderRef, qrStartToken);
+        if (success) {
+          setIsAuthenticated(true);
+          return true; // Successfully signed
+        } else {
+          console.error("Signing failed or timed out.");
+          return false;
         }
-    }, []);
+      } else {
+        console.error("Failed to start signing process:", data.error);
+        return false;
+      }
+    } catch (error) {
+      console.error("Error starting signing process:", error);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [resetBankIdProcess]);
 
-    /**
-     * Call the Marknadsurval API after successful authentication.
-     * @param personalNumber - The personal number retrieved from the BankID process.
-     */
-    const callMarknadsurvalApi = useCallback(async (personalNumber: string) => {
-        try {
-            const response = await fetch("/api/marknadsurval", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ personalNumber }), // Pass the personal number
-            });
+  /**
+   * Polls the `collect` API to check the status of the BankID process.
+   * Also refreshes the QR code periodically.
+   * @param orderRef - The order reference for the current BankID session.
+   * @param qrStartToken - The token used for refreshing the QR code.
+   */
+  const startPolling = useCallback(
+    (orderRef: string, qrStartToken: string): Promise<boolean> => {
+      return new Promise((resolve) => {
+        let pollingInterval: NodeJS.Timeout | null = null;
+        let qrRefreshInterval: NodeJS.Timeout | null = null;
 
-            const data = await response.json();
-
-            if (response.ok) {
-                console.log("Marknadsurval API success:", data);
-                return data; // Return the API response
-            } else {
-                console.error("Marknadsurval API error:", data.message);
-                return null; // Return null for error cases
-            }
-        } catch (error) {
-            console.error("Error calling Marknadsurval API:", error);
-            return null; // Return null for exceptions
-        }
-    }, []);
-
-    /**
-     * Poll the `collect` API to check the status of the BankID process.
-     * @param orderRef - The reference ID of the ongoing order.
-     * @param qrStartToken - The token associated with the QR session.
-     */
-    const startPolling = useCallback((orderRef: string, qrStartToken: string) => {
+        // Polling function for the `collect` endpoint
         const poll = async () => {
-            try {
-                const response = await fetch("/api/bankid?method=collect", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ orderRef }),
-                });
-                const data = await response.json();
+          try {
+            const response = await fetch("/api/bankid?method=collect", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ orderRef }),
+            });
+            const data = await response.json();
 
-                if (data.success) {
-                    if (data.data.status === "complete") {
-                        setIsAuthenticated(true);
-                        clearInterval(pollingInterval); // Stop polling
-                        clearInterval(refreshIntervalId); // Stop QR refresh
+            if (data.success) {
+              if (data.data.status === "complete") {
+                // Stop polling and QR refresh
+                clearInterval(pollingInterval!);
+                clearInterval(qrRefreshInterval!);
 
-                        // Extract personal number from completion data
-                        const personalNumber = data.data.completionData?.user?.personalNumber;
-
-                        if (personalNumber) {
-                            // Call Marknadsurval API
-                            await callMarknadsurvalApi(personalNumber);
-                        }
-
-                        // Redirect to profile page
-                        router.push("/profile");
-                    } else if (data.data.status === "failed") {
-                        setHasTimedOut(true);
-                        console.error("Authentication failed:", data.data.hintCode);
-
-                        // Handle specific hintCode scenarios
-                        switch (data.data.hintCode) {
-                            case "startFailed":
-                                console.error("The BankID app was not started. Please try again.");
-                                break;
-                            case "expiredTransaction":
-                                console.error("The BankID session has expired. Please start again.");
-                                break;
-                            case "userCancel":
-                                console.error("The user canceled the authentication.");
-                                break;
-                            case "cancelled":
-                                console.error("The authentication was canceled.");
-                                break;
-                            default:
-                                console.error("An unknown authentication error occurred.");
-                                break;
-                        }
-
-                        clearInterval(pollingInterval); // Stop polling
-                        clearInterval(refreshIntervalId); // Stop QR refresh
-                    }
-                } else if (data.data.status === "pending") {
-                    console.log("Authentication pending...");
-                } else {
-                    throw new Error("Unexpected response from collect API.");
+                // Optionally handle user data, such as personalNumber
+                const personalNumber = data.data.completionData?.user?.personalNumber;
+                if (personalNumber) {
+                  await callMarknadsurvalApi(personalNumber); // Call additional API
                 }
-            } catch (error) {
-                console.error("Error during collect polling:", error);
+
+                resolve(true); // Authentication completed successfully
+                return;
+              } else if (data.data.status === "failed") {
+                // Stop polling and QR refresh
+                clearInterval(pollingInterval!);
+                clearInterval(qrRefreshInterval!);
+
+                setHasTimedOut(true);
+                console.error("Authentication failed:", data.data.hintCode);
+                resolve(false); // Authentication failed
+                return;
+              }
             }
+          } catch (error) {
+            console.error("Error during polling:", error);
+          }
         };
 
-        const pollingInterval = setInterval(poll, collectInterval);
-
-        // QR refresh logic
+        // QR refresh function
         const refreshQr = async () => {
-            try {
-                const response = await fetch(
-                    `/api/bankid?method=refresh-qr&params=${encodeURIComponent(
-                        JSON.stringify({
-                            qrStartToken,
-                            startDate: new Date().toISOString(),
-                        })
-                    )}`,
-                    { method: "GET" }
-                );
+          try {
+            const response = await fetch(
+              `/api/bankid?method=refresh-qr&params=${encodeURIComponent(
+                JSON.stringify({ qrStartToken, startDate: new Date().toISOString() })
+              )}`,
+              { method: "GET" }
+            );
+            const qrResponse = await response.json();
 
-                const qrResponse = await response.json();
-                if (qrResponse.success) {
-                    setQrData(qrResponse.qrData);
-                } else {
-                    console.error("Error refreshing QR code:", qrResponse.error);
-                }
-            } catch (error) {
-                console.error("Error during QR code refresh:", error);
+            if (qrResponse.success) {
+              setQrData(qrResponse.qrData); // Update QR code
+            } else {
+              console.error("Error refreshing QR code:", qrResponse.error);
             }
+          } catch (error) {
+            console.error("Error during QR refresh:", error);
+          }
         };
 
-        const refreshIntervalId = setInterval(refreshQr, refreshInterval);
+        // Start polling and QR refreshing intervals
+        pollingInterval = setInterval(poll, POLLING_INTERVAL);
+        qrRefreshInterval = setInterval(refreshQr, REFRESH_INTERVAL);
 
         // Stop polling and QR refresh after the timeout duration
         setTimeout(() => {
-            clearInterval(pollingInterval);
-            clearInterval(refreshIntervalId);
-            setHasTimedOut(true);
-        }, timeoutDuration);
-    }, [callMarknadsurvalApi, router]);
+          clearInterval(pollingInterval!);
+          clearInterval(qrRefreshInterval!);
+          setHasTimedOut(true);
+          resolve(false); // Timeout occurred
+        }, TIMEOUT_DURATION);
+      });
+    },
+    []
+  );
 
-    return {
-        qrData,
-        isLoading,
-        hasTimedOut,
-        isAuthenticated,
-        startAuthProcess,
-        startSignProcess,
-    };
+  /**
+   * Calls an additional API after successful authentication.
+   * @param personalNumber - The user's personal number retrieved from BankID.
+   */
+  const callMarknadsurvalApi = useCallback(async (personalNumber: string) => {
+    try {
+      const response = await fetch("/api/marknadsurval", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ personalNumber }),
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log("Marknadsurval API success:", data);
+        return data;
+      } else {
+        console.error("Marknadsurval API error:", data.message);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error calling Marknadsurval API:", error);
+      return null;
+    }
+  }, []);
+
+  return {
+    qrData,
+    isLoading,
+    hasTimedOut,
+    isAuthenticated,
+    startAuthProcess,
+    startSignProcess,
+    resetBankIdProcess,
+  };
 };
 
 export default useBankId;

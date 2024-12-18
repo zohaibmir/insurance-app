@@ -125,7 +125,6 @@ class BankIdService {
    * @returns The status of the ongoing order
    */
   async collect(orderRef: string) {
-    console.log(" I am here");
     const data = await this.callApi<{
       status: string;
       hintCode?: string;
@@ -133,6 +132,7 @@ class BankIdService {
         user: {
           personalNumber: string;
           name: string;
+          email?:string;
         };
       };
     }>("collect", { orderRef });

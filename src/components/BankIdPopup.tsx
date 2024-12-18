@@ -12,16 +12,18 @@ interface BankIdPopupProps {
 const BankIdPopup: React.FC<BankIdPopupProps> = ({ qrData, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-96 text-center">
-        <h2 className="text-xl font-bold mb-4">Scan the QR Code</h2>
+      <div className="bg-white rounded-lg shadow-lg p-6 text-center">
         {qrData ? (
           <Image
               src={qrData}
+              className="h-[127px] w-[127px]"
               alt="BankID QR Code"
-              layout="fill" // Makes the image fill its container
               objectFit="contain" // Ensures the QR code is fully visible
               priority // Ensures it's loaded as soon as possible
+              width={250} 
+              height={250} 
             />
+            
         ) : (
           <p>Loading QR Code...</p>
         )}

@@ -3,7 +3,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import bankIdService from "@/core/services/bankIdService";
-import { setSession } from "@/core/utils/sessionUtils";
+import { generateToken } from "@/core/utils/sessionUtils";
 import customerService from "@/core/services/customerService";
 
 class BankIdController {
@@ -55,31 +55,27 @@ class BankIdController {
         { status: 400 }
       );
     }
-
+    
     const data = await bankIdService.collect(orderRef);
     if (data.status === "complete") {
       const personalNumber = data.completionData?.user?.personalNumber;
+      let customer = null;
 
       if (personalNumber) {
-        // Generate a session ID
-        const sessionId = Math.random().toString(36).substring(2);
-
-        // Save the user's ID (personalNumber) in the session
-        setSession(sessionId, { user_id: personalNumber });
-
-        const customer = await customerService.findCustomerByBankId(personalNumber);
-        if (customer?.email && customer?.phone) {
-          const response = NextResponse.json({ redirectTo: "/dashboard" });
-          response.cookies.set("session_id", sessionId, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            path: "/",
-            maxAge: 60 * 60 * 24, // 1 day
-          });
+         customer = await customerService.findCustomerByBankId(personalNumber);
+        if (customer?.email && data.completionData) {
+          data.completionData.user.email = customer.email;
         }
+
       }
+
+      const res = NextResponse.json({ success: true, data });
+      const token = await generateToken({ customer });
+      res.cookies.set("token", token, { httpOnly: true, secure: true, sameSite: "strict", path: "/", });
+      return res;
     }
-    return NextResponse.json({ success: true, data });
+
+    return NextResponse.json({ success: false, data });
   }
 
   /**
@@ -96,5 +92,4 @@ class BankIdController {
 // Assign the instance of the controller to a named variable
 const bankIdController = new BankIdController();
 
-// Export the named variable
 export default bankIdController;

@@ -31,6 +31,17 @@ export default function DashboardLayout({
           </SidebarHeader>
           <SidebarContent>
             <nav className="space-y-2 px-4 py-4">
+
+            <Link 
+                href="/userdashboard/profile"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-gray-900 ${
+                  pathname === '/userdashboard' ? 'bg-gray-100 text-gray-900' : 'text-gray-500'
+                }`}
+              >
+                <Shield className="h-4 w-4" />
+                <span>Mina Profil</span>
+              </Link>
+
               <Link 
                 href="/userdashboard"
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-gray-900 ${

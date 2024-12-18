@@ -1,28 +1,40 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@/core/utils/sessionUtils"; // Import session utility
 import type { NextRequest } from "next/server";
+import { verifyToken } from "@/core/utils/sessionUtils";
 
-export async function middleware(request: NextRequest) {
-  // Define routes to protect
-  const protectedRoutes = ["/profile", "/dashboard"];
+export async function middleware(req: NextRequest) {
+  // Get the token from cookies
+  const token = req.cookies.get("token")?.value;
+  //const token = req.cookies.get("token")?.value;
+  console.log("Token received 1:", token);
 
-  // Check if the requested route is protected
-  if (protectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route))) {
-    // Get the session for the current user
-    const session = await getSession(request);
-
-    // Check if the user is authenticated
-    if (!session || !session.user_id) {
-      // Redirect to the home page if not authenticated
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+  // If no token is present, redirect to the home page ("/")
+  if (!token) {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
-  // Allow the request to proceed
-  return NextResponse.next();
+  try {
+    // Verify the token (make sure `verifyToken` is asynchronous if needed)
+    const user = await verifyToken(token);
+
+    if (!user) {
+      // If the token is invalid or expired, redirect to the home page
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    // Optionally, attach the user info to the request headers for downstream use
+    req.headers.set("user", JSON.stringify(user));
+
+    // Allow the request to continue
+    return NextResponse.next();
+  } catch (err) {
+    console.error("Token verification error:", err);
+    // Redirect to the home page if token verification fails
+    return NextResponse.redirect(new URL("/", req.url));
+  }
 }
 
-// Specify which routes the middleware should apply to
+// Configure middleware to protect specific routes
 export const config = {
-  matcher: ["/profile", "/dashboard"], // Protected routes
+  matcher: ["/protected/:path*", "/dashboard/:path*"], // Add all the routes you want to protect
 };
